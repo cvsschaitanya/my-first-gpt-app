@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        
+        #box {
+            position: relative;
+            width: 1000px;
+            height: 600px;
+            /* Adjusted height */
+            border: 3px solid #000;
+            /* Increased thickness */
+        }
+        
+        #square {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="box">
+        <div id="square"></div>
+    </div>
+    <script>
+        var lattices = [{
+            x: 50,
+            y: 50
+        }, {
+            x: 150,
+            y: 350
+        }, {
+            x: 350,
+            y: 250
+        }, {
+            x: 550,
+            y: 450
+        }, {
+            x: 750,
+            y: 150
+        }, {
+            x: 850,
+            y: 350
+        }, {
+            x: 750,
+            y: 550
+        }, {
+            x: 550,
+            y: 250
+        }, {
+            x: 350,
+            y: 450
+        }, {
+            x: 150,
+            y: 150
+        }, {
+            x: 950,
+            y: 50
+        }];
+
+        var square = document.getElementById('square');
+        var currentLatticeIndex = 0;
+        var gravity = 0.2; // Acceleration due to gravity
+        var momentaryAcceleration = 0.01; // Reduced momentary acceleration towards the next lattice point
+        var accelerationX = 0,
+            accelerationY = gravity;
+
+        function updateSquarePosition() {
+            var currentLattice = lattices[currentLatticeIndex];
+
+            // Update accelerations
+            if (posX < currentLattice.x) {
+                accelerationX = momentaryAcceleration;
+            } else if (posX > currentLattice.x) {
+                accelerationX = -momentaryAcceleration;
+            } else {
+                accelerationX = 0;
+            }
+
+            if (posY < currentLattice.y) {
+                accelerationY = momentaryAcceleration + gravity;
+            } else if (posY > currentLattice.y) {
+                accelerationY = -momentaryAcceleration + gravity;
+            } else {
+                accelerationY = gravity;
+            }
+
+            // Update velocities
+            speedX += accelerationX;
+            speedY += accelerationY;
+
+            // Update position
+            posX += speedX;
+            posY += speedY;
+
+            // Bounce off the walls
+            if (posX <= 0 || posX >= 987) { // Adjusted to consider the thicker walls
+                speedX = -speedX;
+            }
+
+            if (posY <= 0 || posY >= 587) { // Adjusted to consider the adjusted box height
+                speedY = -speedY;
+            }
+
+            // Check if the square has reached the lattice point
+            if (Math.abs(posX - currentLattice.x) < 1 && Math.abs(posY - currentLattice.y) < 1) {
+                // Move to the next lattice point
+                currentLatticeIndex = (currentLatticeIndex + 1) % lattices.length;
+            }
+
+            // Update square position
+            square.style.left = posX + 'px';
+            square.style.top = posY + 'px';
+
+            // Repeat the update
+            requestAnimationFrame(updateSquarePosition);
+        }
+
+        // Get initial position and speed
+        var posX = lattices[0].x,
+            posY = lattices[0].y;
+        var speedX = 2,
+            speedY = 2; // Original speed
+
+        // Start the animation
+        updateSquarePosition();
+    </script>
+</body>
+
+</html>
